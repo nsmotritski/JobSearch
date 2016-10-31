@@ -35,11 +35,11 @@ public class JobSearch {
                     .until(new ExpectedCondition<WebElement>() {
                         @Override
                         public WebElement apply(WebDriver d) {
-                            return d.findElement(By.cssSelector("a[title='Работа']"));
+                            return d.findElement(By.id("mainmenu"));
                         }
                     });
             //Clicking the element, opening and initializing the "jobs.tut.by" page
-            element.click();
+            element.findElement(By.xpath("//ul/li[6]")).click();
             JobsTutBy jobsPage = new JobsTutBy();
             jobsPage.jobsTutByPage(driver);
             //explicit wait until the menu item is loaded
@@ -53,7 +53,7 @@ public class JobSearch {
             String s = "Специалист по тестированию";
             searchElement.sendKeys(s);
             searchElement.submit();
-            //explicit wait for the list of the results to be shown on the page
+            /*//explicit wait for the list of the results to be shown on the page - does not work
             try {
                 WebDriverWait wait = new WebDriverWait(driver, 10);
                 wait.until(
@@ -62,22 +62,26 @@ public class JobSearch {
             catch (TimeoutException ex) {
                 System.out.println("Expected element was not found");
                 throw ex;
-            }
+            }*/
+            //Getting list of headers of the search result elements
+            WebElement myDynamicElement = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.presenceOfElementLocated(By.className("search-result")));
 
-            /*WebElement searchResult = (new WebDriverWait(driver, 10))
-                    .until(new ExpectedCondition<WebElement>(){
-                        @Override
-                        public WebElement apply(WebDriver d) {
-                            return d.findElement(By.cssSelector("div[class='b-pager__arrows']"));
-                        }});*/
-            List<WebElement> searchResults =  driver.findElements(By.cssSelector("a[data-qa='vacancy-serp__vacancy-title']"));
+            List<WebElement> findElements = myDynamicElement.findElements(By.className("search-result-item"));
+
+            for (WebElement webElement : findElements)
+            {
+                System.out.println (webElement.findElement(By.xpath("div/div[2]/div[1]/a")).getText());
+            }
+            //Checking the condition
             boolean expected = false;
+/*            System.out.println(searchResults.size());
             for (WebElement i :searchResults) {
                 System.out.println (i.getText());
                 if (i.getText().contains(s)) {
                     expected = true;
                 }
-            }
+            }*/
             Assert.assertTrue(expected);
         }
         catch(AssertionError ex){
@@ -85,41 +89,7 @@ public class JobSearch {
             throw ex;
 
         }
-        //explicit wait for the element to be shown
-       /* WebElement myDynamicElement = (new WebDriverWait(driver, 10))
-                .until(new ExpectedCondition<WebElement>(){
-                    @Override
-                    public WebElement apply(WebDriver d) {
-                        return d.findElement(By.name("text"));
-                    }});
-        //entering the search query and submitting
-        myDynamicElement.sendKeys("Специалист по тестированию");
-        myDynamicElement.submit();
 
-
-        WebElement element = driver.findElement(By.cssSelector("a[title='Работа']") );
-        element.click();*/
-        //explicit wait until the textbox is loaded
-
-        //explicit wait until div with search results is loaded
-            /*WebDriverWait wait = new WebDriverWait(driver, 20);
-            wait.until(presenceOfElementLocated(By.cssSelector(
-                    String.valueOf(By.xpath("html/body/div[5]/div[1]/div/div[4]/div/table/tbody/tr/td[2]/div/table")))));
-            *//*WebElement searchResult = (new WebDriverWait(driver, 10))
-                    .until(new ExpectedCondition<WebElement>(){
-                        @Override
-                        public WebElement apply(WebDriver d) {
-                            return d.findElement(By.xpath("html/body/div[5]/div[1]/div/div[4]/div/table/tbody/tr/td[2]/div/table"));
-                        }});*//*
-            //gathering the information on the search results into array of String elements
-           List<WebElement> searchResults =  driver.findElements(By.cssSelector("a[data-qa='vacancy-serp__vacancy-title']"));
-            *//*for (int i=0;i<20;i++){
-                searchResults[i] =
-            }*//*
-
-
-            System.out.println("Page URL is: " + driver.getCurrentUrl());
-            Assert.assertTrue(driver.getTitle().equals("Работа в Минске, поиск работы в Беларуси. Вакансии и резюме на jobs.tut.by | РАБОТА.TUT.BY"));*/
         finally {
             driver.quit();
         }
